@@ -1,18 +1,14 @@
 #!/usr/bin/env bash
-# web server for deployment
-sudo apt-get -y update
-sudo apt-get -y install nginx
+# Script using bash to setup webservers for deployment of simple HTML
+# content
 
-sudo mkdir -p /data/web_static/shared/
-sudo mkdir -p /data/web_static/releases/test/
-
-echo -e "<html>\n\t<head>\n\t</head>\n\t<body>\n\t\tHolberton School\n\t</body>\n</html>" >/data/web_static/releases/test/index.html
-
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
-
-sudo chown -R ubuntu:ubuntu /data
-
-new_str="location /hbnb_static {\nalias /data/web_static/current;\n}"
-sudo sed -i "/# Only/ i $new_str" /etc/nginx/sites-enabled/default
-
-sudo service nginx restart
+apt-get update && \
+apt-get install -y nginx && \
+mkdir -p -m=755 /data/web_static/{releases/test,shared} || exit 0
+echo 'Testing 123' > /data/web_static/releases/test/index.html
+ln -sf /data/web_static/releases/test/ /data/web_static/current
+chown -hR ubuntu:ubuntu /data/
+insert='\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;}'
+sed -i "37i $insert" /etc/nginx/sites-available/default
+service nginx restart
+exit 0
